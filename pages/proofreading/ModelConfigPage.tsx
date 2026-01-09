@@ -10,12 +10,16 @@
  * - Persisting selected keys locally for future convenience.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Cpu, Key, Check, ChevronDown } from 'lucide-react';
 import { AiConfig } from '../../types';
 import { Button } from '../../components/Button';
 import { MODEL_FAMILIES } from '../../modelConfig';
 import { DEV_KEYS } from '../../devConfig';
+
+// Badge sizing constants for easy adjustment
+const FAMILY_BADGE_SIZE = 'text-[9px]';
+const OPTION_BADGE_SIZE = 'text-[7px]';
 
 interface ModelConfigPageProps {
   onBack: () => void;
@@ -27,6 +31,9 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
   const [selectedFamilyId, setSelectedFamilyId] = useState<string>(MODEL_FAMILIES[0].id);
   const [openRouterKey, setOpenRouterKey] = useState('');
   const [rememberOpenRouter, setRememberOpenRouter] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   /**
    * Initialize OpenRouter key from localStorage or devConfig if saved.
@@ -37,6 +44,19 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
       setOpenRouterKey(savedKey);
       setRememberOpenRouter(true);
     }
+  }, []);
+
+  /**
+   * Handle click outside to close custom dropdowns
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   /**
@@ -95,6 +115,7 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
       }
     }));
     setSelectedFamilyId(familyId);
+    setActiveDropdown(null);
   };
 
   const badgeStyles: Record<string, string> = {
@@ -145,7 +166,7 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
       )}
 
       {/* Model Family List */}
-      <div className="space-y-4">
+      <div className="space-y-4" ref={dropdownRef}>
         {MODEL_FAMILIES.map((family) => {
           const isSelected = selectedFamilyId === family.id;
           return (
@@ -172,7 +193,7 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
                         {family.name}
                       </h3>
                       {family.badge && (
-                        <span className={`px-2 py-[1px] rounded-full text-[10px] uppercase font-bold tracking-wider border ${badgeStyles[family.badge.color] || badgeStyles.blue}`}>
+                        <span className={`px-1.5 py-[0.5px] rounded-full ${FAMILY_BADGE_SIZE} uppercase font-bold tracking-wider border ${badgeStyles[family.badge.color] || badgeStyles.blue}`}>
                           {family.badge.label}
                         </span>
                       )}
@@ -183,28 +204,55 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
                   </div>
                 </div>
 
-                {/* Sub-options (like Model Variant or Parameter Size) */}
+                {/* Sub-options (Custom Dropdowns) */}
                 {family.options.length > 0 && (
                   <div className="flex flex-wrap gap-2 items-center md:justify-end mt-2 md:mt-0">
-                    {family.options.map((opt) => (
-                      <div key={opt.id} className="relative" onClick={(e) => e.stopPropagation()}>
-                        <select
-                          value={selections[family.id][opt.id]}
-                          onChange={(e) => handleOptionChange(family.id, opt.id, e.target.value)}
-                          className={`appearance-none pl-3 pr-8 py-1.5 rounded-lg text-sm font-medium border outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer ${
-                             isSelected ? 'bg-white border-blue-200 text-blue-800 shadow-sm' : 'bg-slate-100 border-transparent text-slate-600 group-hover:bg-white group-hover:border-slate-300'
-                          }`}
-                        >
-                          {opt.choices.map((c) => (
-                            <option key={c.value} value={c.value}>{c.label}</option>
-                          ))}
-                        </select>
-                        <ChevronDown 
-                          size={14} 
-                          className={`absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none ${isSelected ? 'text-blue-400' : 'text-slate-400'}`} 
-                        />
-                      </div>
-                    ))}
+                    {family.options.map((opt) => {
+                      const dropdownId = `${family.id}-${opt.id}`;
+                      const isOpen = activeDropdown === dropdownId;
+                      const currentVal = selections[family.id][opt.id];
+                      const currentChoice = opt.choices.find(c => c.value === currentVal);
+
+                      return (
+                        <div key={opt.id} className="relative" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => setActiveDropdown(isOpen ? null : dropdownId)}
+                            className={`flex items-center gap-2 pl-3 pr-2 py-1.5 rounded-lg text-sm font-medium border outline-none transition-all ${
+                               isSelected ? 'bg-white border-blue-200 text-blue-800 shadow-sm' : 'bg-slate-100 border-transparent text-slate-600 group-hover:bg-white group-hover:border-slate-300'
+                            }`}
+                          >
+                            <span className="truncate max-w-[150px] md:max-w-[200px]">{currentChoice?.label}</span>
+                            <ChevronDown 
+                              size={14} 
+                              className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} ${isSelected ? 'text-blue-400' : 'text-slate-400'}`} 
+                            />
+                          </button>
+                          
+                          {/* Custom Options List */}
+                          {isOpen && (
+                            <div className="absolute top-full right-0 mt-1 z-50 bg-white border border-slate-200 rounded-xl shadow-xl min-w-[220px] max-h-60 overflow-y-auto p-1 animate-in fade-in zoom-in-95 duration-100">
+                              {opt.choices.map((choice) => (
+                                <button
+                                  key={choice.value}
+                                  onClick={() => handleOptionChange(family.id, opt.id, choice.value)}
+                                  className={`w-full flex items-center justify-between px-3 py-2 text-sm rounded-lg transition-colors ${
+                                    currentVal === choice.value ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                                  }`}
+                                >
+                                  <span className="flex-1 text-left">{choice.label}</span>
+                                  {choice.badge && (
+                                    <span className={`ml-2 px-1 py-0 rounded-full ${OPTION_BADGE_SIZE} uppercase font-bold tracking-tight border shrink-0 ${badgeStyles[choice.badge.color] || badgeStyles.blue}`}>
+                                      {choice.badge.label}
+                                    </span>
+                                  )}
+                                  {currentVal === choice.value && <Check size={14} className="ml-2 shrink-0" />}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

@@ -11,6 +11,7 @@ export type ModelBadge = {
 export type ModelOption = {
   label: string;
   value: string;
+  badge?: ModelBadge;
 };
 
 export type ModelFamily = {
@@ -39,8 +40,8 @@ export const MODEL_FAMILIES: ModelFamily[] = [
       {
         id: 'model',
         choices: [
-          { label: 'Gemini 2.5 Flash Lite (Fastest)', value: 'gemini-2.5-flash-lite' },
-          { label: 'Gemini 3 Flash (Recommended)', value: 'gemini-3-flash-preview' },
+          { label: 'Gemini 2.5 Flash Lite (Fastest)', value: 'gemini-2.5-flash-lite-latest' },
+          { label: 'Gemini 3 Flash', value: 'gemini-3-flash-preview', badge: { label: 'Recommended', color: 'green' } },
           { label: 'Gemini 3 Pro (Best)', value: 'gemini-3-pro-preview' }
         ],
         default: 'gemini-3-flash-preview'
@@ -49,20 +50,43 @@ export const MODEL_FAMILIES: ModelFamily[] = [
     getModelId: (s) => s.model
   },
   {
-    id: 'openai',
-    name: 'OpenAI GPT-5',
+    id: 'anthropic',
+    name: 'Anthropic Claude',
     provider: 'openrouter',
-    description: 'The classic SOTA AI',
+    description: 'Top-tier frontier intelligence',
+    badge: { label: 'Recommended', color: 'green' },
     options: [
       {
         id: 'variant',
         choices: [
-          { label: 'Nano (Faster)', value: '5-nano' },
-          { label: 'Mini (Recommended)', value: '5-mini' },
-          { label: '5.1 Chat (High Accuracy)', value: '5.1-Chat' },
-          { label: '5.2 Chat (Highest Accuracy, higher cost)', value: '5.2-Chat' }
+          { label: '3 Haiku (Oldest/much cheaper)', value: '3-haiku' },
+          { label: '3.5 Haiku (Older/less expensive)', value: '3.5-haiku' },
+          { label: '4.5 Haiku (Best performance)', value: 'haiku-4.5' , badge: { label: 'Recommended', color: 'green' } }
         ],
-        default: '5-mini'
+        default: 'haiku-4.5'
+      }
+    ],
+    getModelId: (s) => `anthropic/claude-${s.variant}`
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI GPT-5',
+    provider: 'openrouter',
+    description: 'The classic SOTA AI',
+    badge: { label: 'Recommended', color: 'green' },
+    options: [
+      {
+        id: 'variant',
+        choices: [
+          { label: '4.1 Nano (Fastest, non-reasoning)', value: '4.1-nano' },
+          { label: '4.1 Mini (Non-reasoning)', value: '4.1-mini' },
+          { label: '4.1 (Non-reasoning, high accuracy)', value: '4.1', badge: { label: 'Recommended', color: 'green' } },
+          { label: '5 Nano (Faster)', value: '5-nano' },
+          { label: '5 Mini (Fast reasoning)', value: '5-mini' },
+          { label: '5.1 Chat (Similar performance to 5.2, lower cost)', value: '5.1-Chat', badge: { label: 'Recommended', color: 'green' } },
+          { label: '5.2 Chat (Highest Accuracy)', value: '5.2-Chat', badge: { label: 'Recommended', color: 'green' } }
+        ],
+        default: '5.2-Chat'
       }
     ],
     getModelId: (s) => `openai/gpt-${s.variant}`
@@ -71,18 +95,34 @@ export const MODEL_FAMILIES: ModelFamily[] = [
     id: 'glm',
     name: 'Z.ai GLM',
     provider: 'openrouter',
-    description: 'High-performance reasoning models',
+    description: 'High-performance open reasoning models',
     options: [
       {
         id: 'version',
         choices: [
-          { label: '4.6v (Accuracy)', value: 'z-ai/glm-4.6v' },
+          { label: '4.6v (Accuracy)', value: 'z-ai/glm-4.6v', badge: { label: 'Recommended', color: 'green' } },
           { label: '4.1v 9B (Speed)', value: 'thudm/glm-4.1v-9b-thinking' }
         ],
         default: 'z-ai/glm-4.6v'
       }
     ],
     getModelId: (s) => s.version
+  },
+  {
+    id: 'internvl',
+    name: 'InternVL 3',
+    provider: 'openrouter',
+    description: 'Open Vision Model',
+    options: [
+      {
+        id: 'model',
+        choices: [
+          { label: 'InternVL3-78B', value: 'opengvlab/internvl3-78b' }
+        ],
+        default: 'opengvlab/internvl3-78b'
+      }
+    ],
+    getModelId: (s) => s.model
   },
   {
     id: 'mistral_3',
@@ -116,8 +156,8 @@ export const MODEL_FAMILIES: ModelFamily[] = [
         choices: [
           { label: '8B (Efficient)', value: '8b' },
           { label: '30B (Balanced)', value: '30b' },
-          { label: '32B (Instruct)', value: '32b' },
-          { label: '235B (Max)', value: '235b' }
+          { label: '32B (Instruct)', value: '32b', badge: { label: 'Recommended', color: 'green' } },
+          { label: '235B (Max)', value: '235b', badge: { label: 'Recommended', color: 'green' } }
         ],
         default: '32b'
       },
@@ -125,7 +165,7 @@ export const MODEL_FAMILIES: ModelFamily[] = [
         id: 'variant',
         choices: [
           { label: 'Instruct', value: 'instruct' },
-          { label: 'Thinking', value: 'thinking' }
+          { label: 'Thinking', value: 'thinking' , badge: { label: 'Recommended', color: 'green' } }
         ],
         default: 'thinking'
       }
@@ -159,7 +199,7 @@ export const MODEL_FAMILIES: ModelFamily[] = [
         id: 'variant',
         choices: [
           { label: 'Scout (speed)', value: 'scout' },
-          { label: 'Maverick', value: 'maverick' }
+          { label: 'Maverick', value: 'maverick', badge: { label: 'Recommended', color: 'green' } }
         ],
         default: 'maverick'
       }
