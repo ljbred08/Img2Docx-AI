@@ -10,6 +10,8 @@
 
 import React, { useState, useEffect } from 'react';
 import saveAs from 'file-saver';
+import { useConvexAuth } from 'convex/react';
+import { Auth } from './components/Auth';
 import { AppStep, UploadedImage, OcrPageResult, AiConfig } from './types';
 import { createPdfFromImages } from './services/pdfService';
 import { performMistralOcr } from './services/mistralService';
@@ -29,12 +31,13 @@ import { DownloadPage } from './pages/download/DownloadPage';
 export default function App() {
   // --- Step & Navigation State ---
   const [step, setStep] = useState<AppStep>(AppStep.UPLOAD);
-  
+  const [showAuth, setShowAuth] = useState(false);
+
   // --- Core Data State ---
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [ocrResults, setOcrResults] = useState<OcrPageResult[]>([]);
   const [finalMarkdownPages, setFinalMarkdownPages] = useState<string[]>([]);
-  
+
   // --- Configuration State ---
   const [mistralKey, setMistralKey] = useState('');
   const [rememberMistral, setRememberMistral] = useState(false);
@@ -68,7 +71,7 @@ export default function App() {
       setErrorMsg("Please enter a Mistral API Key");
       return;
     }
-    
+
     // Save or clear the key based on user preference
     if (rememberMistral) {
       localStorage.setItem('img2docx_mistral_key', mistralKey);
@@ -82,17 +85,17 @@ export default function App() {
     try {
       // 1. Generate a PDF from the current sequence of images
       const pdfBlob = await createPdfFromImages(images);
-      
+
       // 2. Perform OCR via Mistral service
       const response = await performMistralOcr(pdfBlob, mistralKey);
-      
+
       // 3. Map raw results to our internal OcrPageResult type
       const results: OcrPageResult[] = response.pages.map((page, index) => ({
         imageId: images[index]?.id || `page-${index}`,
         markdown: page.markdown,
         originalImage: images[index],
       }));
-      
+
       setOcrResults(results);
       setStep(AppStep.PROOFREAD_MODE_SELECT);
     } catch (err: any) {
@@ -122,7 +125,7 @@ export default function App() {
     const newPages = [...finalMarkdownPages];
     newPages[reviewIndex] = text;
     setFinalMarkdownPages(newPages);
-    
+
     if (reviewIndex < ocrResults.length - 1) {
       setReviewIndex(prev => prev + 1);
     } else {
@@ -137,7 +140,7 @@ export default function App() {
   const handleDownload = async (format: 'docx' | 'md') => {
     // Use final proofread pages if available, otherwise fallback to raw OCR
     const content = finalMarkdownPages.length > 0 ? finalMarkdownPages : ocrResults.map(r => r.markdown);
-    
+
     if (format === 'md') {
       const blob = new Blob([content.join('\n\n')], { type: 'text/markdown;charset=utf-8' });
       saveAs(blob, 'converted_document.md');
@@ -146,6 +149,27 @@ export default function App() {
       saveAs(blob, 'converted_document.docx');
     }
   };
+
+  // --- Auth State ---
+  const { isAuthenticated, isLoading } = useConvexAuth();
+  const [docCount, setDocCount] = useState(0);
+
+  /**
+   * Effect to load/save doc count for freemium logic.
+   */
+  useEffect(() => {
+    const count = parseInt(localStorage.getItem('img2docx_p_count') || '0');
+    setDocCount(count);
+  }, []);
+
+  /**
+   * Effect to reset manual auth trigger when authenticated.
+   */
+  useEffect(() => {
+    if (isAuthenticated) {
+      setShowAuth(false);
+    }
+  }, [isAuthenticated]);
 
   /**
    * Resets the application state to start a fresh project.
@@ -167,11 +191,16 @@ export default function App() {
    * Step router to render the appropriate view based on the current AppStep.
    */
   const renderCurrentStep = () => {
+    // Freemium logic: Prompt auth after 1 doc if not authenticated OR if manually requested
+    if (!isAuthenticated && !isLoading && (showAuth || (docCount >= 1 && step !== AppStep.UPLOAD))) {
+      return <Auth onBack={() => setShowAuth(false)} />;
+    }
+
     switch (step) {
       case AppStep.UPLOAD:
       case AppStep.SORT:
         return (
-          <UploadSortPage 
+          <UploadSortPage
             images={images}
             setImages={setImages}
             isFilesLoading={isFilesLoading}
@@ -183,7 +212,7 @@ export default function App() {
         );
       case AppStep.MISTRAL_CONFIG:
         return (
-          <MistralConfigPage 
+          <MistralConfigPage
             mistralKey={mistralKey}
             setMistralKey={setMistralKey}
             rememberMistral={rememberMistral}
@@ -198,7 +227,7 @@ export default function App() {
         return <ProcessingPage />;
       case AppStep.PROOFREAD_MODE_SELECT:
         return (
-          <ProofreadModePage 
+          <ProofreadModePage
             onSelectAi={() => setStep(AppStep.MODEL_CONFIG)}
             onSelectManual={() => startReview(null)}
             onSkip={() => {
@@ -210,14 +239,14 @@ export default function App() {
         );
       case AppStep.MODEL_CONFIG:
         return (
-          <ModelConfigPage 
+          <ModelConfigPage
             onBack={() => setStep(AppStep.PROOFREAD_MODE_SELECT)}
             onConfirm={startReview}
           />
         );
       case AppStep.REVIEW_DOCUMENT:
         return ocrResults[reviewIndex] ? (
-          <ReviewPage 
+          <ReviewPage
             page={ocrResults[reviewIndex]}
             aiConfig={aiConfig}
             pageIndex={reviewIndex}
@@ -233,10 +262,17 @@ export default function App() {
         ) : null;
       case AppStep.DOWNLOAD:
         return (
-          <DownloadPage 
+          <DownloadPage
             includePageBreaks={includePageBreaks}
             setIncludePageBreaks={setIncludePageBreaks}
-            onDownload={handleDownload}
+            onDownload={(f) => {
+              handleDownload(f);
+              if (!isAuthenticated) {
+                const newCount = docCount + 1;
+                setDocCount(newCount);
+                localStorage.setItem('img2docx_p_count', newCount.toString());
+              }
+            }}
             onBackToReview={() => {
               setStep(AppStep.REVIEW_DOCUMENT);
               setReviewIndex(ocrResults.length - 1);
@@ -251,14 +287,19 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header 
+      <Header
         currentPage={step === AppStep.REVIEW_DOCUMENT ? reviewIndex : undefined}
         totalPages={step === AppStep.REVIEW_DOCUMENT ? ocrResults.length : undefined}
         showProgress={step === AppStep.REVIEW_DOCUMENT}
+        onSignInClick={() => setShowAuth(true)}
       />
       <main className="flex-1 bg-slate-50 py-8 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto h-full">
-          {renderCurrentStep()}
+          {isLoading ? (
+            <div className="flex h-full items-center justify-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+            </div>
+          ) : renderCurrentStep()}
         </div>
       </main>
     </div>

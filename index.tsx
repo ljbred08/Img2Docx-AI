@@ -11,6 +11,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
+import { ConvexAuthProvider } from "@convex-dev/auth/react";
+import { ConvexReactClient } from "convex/react";
+
+// Initialize the Convex client
+const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+
 // Retrieve the root element from the HTML document
 const rootElement = document.getElementById('root');
 
@@ -23,6 +29,8 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <App />
+    <ConvexAuthProvider client={convex}>
+      <App />
+    </ConvexAuthProvider>
   </React.StrictMode>
 );
