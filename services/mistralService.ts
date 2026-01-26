@@ -6,6 +6,7 @@ export const performMistralOcr = async (pdfBlob: Blob, apiKey: string): Promise<
   formData.append('file', pdfBlob, 'document.pdf');
   formData.append('purpose', 'ocr');
 
+  console.debug("[Mistral] Uploading file for OCR...");
   const uploadResponse = await fetch('https://api.mistral.ai/v1/files', {
     method: 'POST',
     headers: {
@@ -45,6 +46,8 @@ export const performMistralOcr = async (pdfBlob: Blob, apiKey: string): Promise<
       document_url: signedUrl,
     }
   };
+
+  console.debug("[Mistral] Requesting OCR with payload:", ocrPayload);
 
   const ocrResponse = await fetch('https://api.mistral.ai/v1/ocr', {
     method: 'POST',

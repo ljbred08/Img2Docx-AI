@@ -1,4 +1,3 @@
-
 /**
  * pages/proofreading/ReviewPage.tsx
  * 
@@ -35,6 +34,9 @@ interface ReviewPageProps {
   onNext: (markdown: string) => void;
   /** Callback to navigate backwards in the workflow */
   onBack: () => void;
+  /** Global auto-advance state */
+  autoAdvance: boolean;
+  setAutoAdvance: (val: boolean) => void;
 }
 
 export const ReviewPage: React.FC<ReviewPageProps> = ({ 
@@ -43,7 +45,9 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   pageIndex, 
   totalPages, 
   onNext,
-  onBack
+  onBack,
+  autoAdvance,
+  setAutoAdvance
 }) => {
   // --- Text & AI Suggestion State ---
   const [text, setText] = useState(page.markdown);
@@ -54,6 +58,12 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   const [aiMessage, setAiMessage] = useState<string | null>(null);
   const [hasError, setHasError] = useState(false);
   const [isDiffMode, setIsDiffMode] = useState(false);
+  
+  /** 
+   * Tracks number of automatic retries performed for the current page analysis.
+   * Reset on page change.
+   */
+  const [retryCount, setRetryCount] = useState(0);
   
   // --- Custom Prompt State ---
   const [customPrompt, setCustomPrompt] = useState('');
@@ -114,12 +124,43 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
     setSuggestion(null);
     setIsDiffMode(false);
     setCustomPrompt('');
+    setRetryCount(0); // Reset retries for the new page
     
     // Initial analysis uses the fresh page content
     runAnalysis(undefined, page.markdown);
     
     return () => { analysisIdRef.current += 1; };
   }, [page, aiConfig, runAnalysis]);
+
+  /**
+   * Pipeline Control Logic: Handles Auto-Advance and Error Retries.
+   * - If 'done' and 'autoAdvance' is active: Proceed to next page after short delay.
+   * - If 'error' and 'autoAdvance' is active: Automatically retry once before pausing.
+   */
+  useEffect(() => {
+    // 1. Success Path: Auto-advance to next page
+    if (autoAdvance && status === 'done') {
+      const timer = setTimeout(() => {
+        // Double check conditions still apply after timeout
+        if (autoAdvance && status === 'done') {
+          const finalContent = suggestion || text;
+          onNext(finalContent);
+        }
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+
+    // 2. Error Path: Retry once automatically
+    if (autoAdvance && status === 'error' && retryCount < 1) {
+      const timer = setTimeout(() => {
+        if (autoAdvance && status === 'error' && retryCount < 1) {
+          setRetryCount(1); // Mark that we've used our single automatic retry
+          runAnalysis(customPrompt, text);
+        }
+      }, 1500); // 1.5s delay to let transient issues resolve
+      return () => clearTimeout(timer);
+    }
+  }, [status, autoAdvance, suggestion, text, onNext, retryCount, runAnalysis, customPrompt]);
 
   /**
    * Computes the visual difference between the current text and the AI's suggested correction.
@@ -212,7 +253,7 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
   const handleRerunAi = (e: React.FormEvent) => {
     e.preventDefault();
     if (status !== 'analyzing') {
-      // Pass the CURRENT text state to the analysis function
+      setRetryCount(0); // Reset retry logic for manual reruns
       runAnalysis(customPrompt, text);
     }
   };
@@ -234,6 +275,8 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
         setCustomPrompt={setCustomPrompt}
         onRerun={handleRerunAi}
         isAnalyzing={status === 'analyzing'}
+        autoAdvance={autoAdvance}
+        setAutoAdvance={setAutoAdvance}
       />
 
       {/* Main Review Layout (Side-by-Side) */}

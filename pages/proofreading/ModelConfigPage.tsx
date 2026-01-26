@@ -1,4 +1,3 @@
-
 /**
  * pages/proofreading/ModelConfigPage.tsx
  * 
@@ -11,7 +10,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Cpu, Key, Check, ChevronDown } from 'lucide-react';
+import { Cpu, Key, Check, ChevronDown, Zap } from 'lucide-react';
 import { AiConfig } from '../../types';
 import { Button } from '../../components/Button';
 import { MODEL_FAMILIES } from '../../modelConfig';
@@ -31,6 +30,7 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
   const [selectedFamilyId, setSelectedFamilyId] = useState<string>(MODEL_FAMILIES[0].id);
   const [openRouterKey, setOpenRouterKey] = useState('');
   const [rememberOpenRouter, setRememberOpenRouter] = useState(false);
+  const [nitro, setNitro] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -94,8 +94,13 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
     }
 
     const familySelections = selections[family.id];
-    const modelId = family.getModelId(familySelections);
+    let modelId = family.getModelId(familySelections);
     
+    // Append nitro flag if enabled for OpenRouter providers
+    if (family.provider === 'openrouter' && nitro) {
+      modelId = `${modelId}:nitro`;
+    }
+
     onConfirm({ 
       provider: family.provider, 
       modelId,
@@ -134,33 +139,53 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
         <p className="text-slate-500 mt-2">Select the intelligence model that best fits your needs.</p>
       </div>
 
-      {/* Conditional OpenRouter Key Entry */}
+      {/* Conditional OpenRouter Key Entry & Nitro Mode */}
       {isKeyRequired && (
-        <div className="mb-6 animate-in slide-in-from-top-2 fade-in duration-300">
-          <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
-            <Key size={14} className="text-indigo-500"/> OpenRouter API Key
-          </label>
-          <div className="relative">
-            <input 
-              type="password" 
-              value={openRouterKey}
-              onChange={(e) => setOpenRouterKey(e.target.value)}
-              placeholder="sk-or-..." 
-              autoFocus
-              className="w-full pl-4 pr-4 py-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-indigo-50/30 text-slate-800"
-            />
+        <div className="mb-6 animate-in slide-in-from-top-2 fade-in duration-300 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
+              <Key size={14} className="text-indigo-500"/> OpenRouter API Key
+            </label>
+            <div className="relative">
+              <input 
+                type="password" 
+                value={openRouterKey}
+                onChange={(e) => setOpenRouterKey(e.target.value)}
+                placeholder="sk-or-..." 
+                autoFocus
+                className="w-full pl-4 pr-4 py-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-indigo-50/30 text-slate-800"
+              />
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <input 
+                type="checkbox" 
+                id="remember_openrouter"
+                checked={rememberOpenRouter}
+                onChange={(e) => setRememberOpenRouter(e.target.checked)}
+                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              />
+              <label htmlFor="remember_openrouter" className="text-xs text-slate-500 cursor-pointer select-none">
+                Remember this key for next time
+              </label>
+            </div>
           </div>
-          <div className="flex items-center gap-2 mt-2">
+
+          <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-start gap-4 transition-all">
             <input 
               type="checkbox" 
-              id="remember_openrouter"
-              checked={rememberOpenRouter}
-              onChange={(e) => setRememberOpenRouter(e.target.checked)}
-              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+              id="nitro_mode"
+              checked={nitro}
+              onChange={(e) => setNitro(e.target.checked)}
+              className="mt-1.5 w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 shrink-0"
             />
-            <label htmlFor="remember_openrouter" className="text-xs text-slate-500 cursor-pointer select-none">
-              Remember this key for next time
-            </label>
+            <div className="flex-1">
+              <label htmlFor="nitro_mode" className="text-sm font-bold text-indigo-900 cursor-pointer flex items-center gap-1.5">
+                <Zap size={14} className="fill-current text-amber-500" /> Nitro Mode
+              </label>
+              <p className="text-xs text-indigo-600/70 mt-1 leading-relaxed">
+                Prioritizes the fastest available providers on OpenRouter. May incur higher token costs.
+              </p>
+            </div>
           </div>
         </div>
       )}

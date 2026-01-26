@@ -40,6 +40,7 @@ export default function App() {
   const [rememberMistral, setRememberMistral] = useState(false);
   const [aiConfig, setAiConfig] = useState<AiConfig | null>(null);
   const [includePageBreaks, setIncludePageBreaks] = useState(true);
+  const [autoAdvance, setAutoAdvance] = useState(false);
 
   // --- UI/UX Status State ---
   const [isProcessing, setIsProcessing] = useState(false);
@@ -226,6 +227,8 @@ export default function App() {
               if (reviewIndex > 0) setReviewIndex(prev => prev - 1);
               else setStep(AppStep.PROOFREAD_MODE_SELECT);
             }}
+            autoAdvance={autoAdvance}
+            setAutoAdvance={setAutoAdvance}
           />
         ) : null;
       case AppStep.DOWNLOAD:

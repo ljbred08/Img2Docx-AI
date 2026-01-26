@@ -1,4 +1,3 @@
-
 /**
  * pages/proofreading/reviewcomponents/ReviewHeader.tsx
  * 
@@ -7,7 +6,7 @@
  */
 
 import React from 'react';
-import { Loader2, CheckCircle, AlertTriangle, Info, Send } from 'lucide-react';
+import { Loader2, CheckCircle, AlertTriangle, Info, Send, Zap } from 'lucide-react';
 
 interface ReviewHeaderProps {
   /** Page metadata */
@@ -26,6 +25,9 @@ interface ReviewHeaderProps {
   setCustomPrompt: (val: string) => void;
   onRerun: (e: React.FormEvent) => void;
   isAnalyzing: boolean;
+  /** Auto-Advance Props */
+  autoAdvance: boolean;
+  setAutoAdvance: (val: boolean) => void;
 }
 
 export const ReviewHeader: React.FC<ReviewHeaderProps> = ({ 
@@ -38,7 +40,9 @@ export const ReviewHeader: React.FC<ReviewHeaderProps> = ({
   customPrompt,
   setCustomPrompt,
   onRerun,
-  isAnalyzing
+  isAnalyzing,
+  autoAdvance,
+  setAutoAdvance
 }) => {
   return (
     <div className="flex gap-4 mb-4 items-end">
@@ -83,6 +87,20 @@ export const ReviewHeader: React.FC<ReviewHeaderProps> = ({
             </button>
           </form>
         )}
+
+        {/* Auto-Advance Toggle */}
+        <button
+          onClick={() => setAutoAdvance(!autoAdvance)}
+          className={`h-full px-4 rounded-full text-xs font-bold border flex items-center gap-2 transition-all shadow-sm shrink-0 whitespace-nowrap ${
+            autoAdvance 
+              ? 'bg-blue-600 border-blue-600 text-white ring-2 ring-blue-100' 
+              : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+          }`}
+        >
+          <Zap size={14} className={autoAdvance ? 'fill-current' : ''} />
+          <span>Auto-Advance</span>
+          <div className={`w-3 h-3 rounded-full border border-current ${autoAdvance ? 'bg-green-500' : 'bg-transparent'}`} />
+        </button>
 
         {/* Status Badge - Fixed height, smaller text-xs */}
         <div className={`h-full px-4 rounded-full text-xs font-semibold border flex items-center gap-2 shadow-sm shrink-0 whitespace-nowrap ${
