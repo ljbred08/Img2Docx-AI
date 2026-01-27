@@ -5,9 +5,10 @@ import { User, LogOut, Settings, CreditCard, ChevronDown, LogIn } from "lucide-r
 
 interface AccountMenuProps {
     onSignInClick: () => void;
+    showSignInButton?: boolean;
 }
 
-export function AccountMenu({ onSignInClick }: AccountMenuProps) {
+export function AccountMenu({ onSignInClick, showSignInButton = true }: AccountMenuProps) {
     const { signOut } = useAuthActions();
     const { isAuthenticated, isLoading } = useConvexAuth();
     const [isOpen, setIsOpen] = useState(false);
@@ -15,6 +16,7 @@ export function AccountMenu({ onSignInClick }: AccountMenuProps) {
     if (isLoading) return null;
 
     if (!isAuthenticated) {
+        if (!showSignInButton) return null;
         return (
             <button
                 onClick={onSignInClick}

@@ -32,6 +32,7 @@ export default function App() {
   // --- Step & Navigation State ---
   const [step, setStep] = useState<AppStep>(AppStep.UPLOAD);
   const [showAuth, setShowAuth] = useState(false);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
 
   // --- Core Data State ---
   const [images, setImages] = useState<UploadedImage[]>([]);
@@ -175,6 +176,13 @@ export default function App() {
    * Resets the application state to start a fresh project.
    */
   const handleReset = () => {
+    // Freemium logic: If limit hit, prompt auth instead of resetting
+    if (!isAuthenticated && docCount >= 1) {
+      setAuthMessage("To process more documents, please sign in.");
+      setShowAuth(true);
+      return;
+    }
+
     // Cleanup allocated URLs to prevent memory leaks
     images.forEach(img => URL.revokeObjectURL(img.previewUrl));
     setImages([]);
@@ -191,9 +199,9 @@ export default function App() {
    * Step router to render the appropriate view based on the current AppStep.
    */
   const renderCurrentStep = () => {
-    // Freemium logic: Prompt auth after 1 doc if not authenticated OR if manually requested
-    if (!isAuthenticated && !isLoading && (showAuth || (docCount >= 1 && step !== AppStep.UPLOAD))) {
-      return <Auth onBack={() => setShowAuth(false)} />;
+    // Show Auth component if NOT authenticated AND manually requested (via buttons or header)
+    if (!isAuthenticated && showAuth) {
+      return <Auth message={authMessage} onBack={() => { setShowAuth(false); setAuthMessage(null); }} />;
     }
 
     switch (step) {
@@ -205,7 +213,14 @@ export default function App() {
             setImages={setImages}
             isFilesLoading={isFilesLoading}
             setIsFilesLoading={setIsFilesLoading}
-            onContinue={() => setStep(AppStep.MISTRAL_CONFIG)}
+            onContinue={() => {
+              if (!isAuthenticated && docCount >= 1) {
+                setAuthMessage("To process more documents, please sign in.");
+                setShowAuth(true);
+              } else {
+                setStep(AppStep.MISTRAL_CONFIG);
+              }
+            }}
             onReset={handleReset}
             setError={setErrorMsg}
           />
@@ -291,7 +306,10 @@ export default function App() {
         currentPage={step === AppStep.REVIEW_DOCUMENT ? reviewIndex : undefined}
         totalPages={step === AppStep.REVIEW_DOCUMENT ? ocrResults.length : undefined}
         showProgress={step === AppStep.REVIEW_DOCUMENT}
-        onSignInClick={() => setShowAuth(true)}
+        onSignInClick={() => {
+          setAuthMessage(null);
+          setShowAuth(true);
+        }}
       />
       <main className="flex-1 bg-slate-50 py-8 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto h-full">

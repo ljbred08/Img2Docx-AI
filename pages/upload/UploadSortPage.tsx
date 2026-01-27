@@ -10,14 +10,14 @@
  */
 
 import React, { useRef } from 'react';
-import { 
-  DndContext, 
+import {
+  DndContext,
   closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
-  DragEndEvent 
+  DragEndEvent
 } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -51,7 +51,7 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
   setError
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   // Configure sensors for dnd-kit (mouse/touch and keyboard support)
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -66,7 +66,7 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
     if (e.target.files) {
       setIsFilesLoading(true);
       const files = Array.from(e.target.files) as File[];
-      
+
       try {
         const processedFiles = await Promise.all(files.map(async (file) => {
           if (file.type === 'application/pdf') {
@@ -82,7 +82,7 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
             }];
           }
         }));
-        
+
         // Merge new images into the existing state
         const flatNewImages = processedFiles.flat();
         setImages(prev => [...prev, ...flatNewImages]);
@@ -118,11 +118,23 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
 
   const sortableIds = images.map(img => img.id);
 
+  /**
+   * commonActionStyles: A centralized style string for primary workflow buttons.
+   * - whitespace-nowrap: Prevents text from breaking into multiple lines.
+   * - h-10: Consistent height of 40px for a perfectly balanced touch target.
+   * - px-8: Generous horizontal padding for better visual balance.
+   * - active:scale-95: Micro-interaction that shrinks the button when clicked.
+   * - transition-all: Smoothly animates between default, hover, and active states.
+   * - font-bold: Increases weight to emphasize the call to action.
+   * - shadow-md / hover:shadow-lg: Dynamic shadows to create a layered, "3D" depth.
+   */
+  const commonActionStyles = "whitespace-nowrap h-10 px-8 active:scale-95 transition-all font-bold shadow-md hover:shadow-lg";
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Upload Trigger Area */}
-      <div 
-        className={`border-2 border-dashed rounded-2xl p-12 text-center hover:bg-slate-50 transition-colors cursor-pointer ${isFilesLoading ? 'border-blue-400 bg-blue-50/20 pointer-events-none' : 'border-slate-300'}`} 
+      <div
+        className={`border-2 border-dashed rounded-2xl p-12 text-center hover:bg-slate-50 transition-colors cursor-pointer ${isFilesLoading ? 'border-blue-400 bg-blue-50/20 pointer-events-none' : 'border-slate-300'}`}
         onClick={() => fileInputRef.current?.click()}
       >
         <input type="file" multiple accept="image/*,.pdf" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
@@ -140,15 +152,23 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
       {/* Grid of uploaded images, visible if items exist */}
       {images.length > 0 && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h3 className="text-lg font-medium text-slate-800">Organize Document ({images.length} pages)</h3>
-              <Button variant="danger" onClick={onReset} className="text-xs py-1.5 px-3 h-auto">
-                <Trash2 size={14} className="mr-1.5" /> Reset
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <h3 className="text-xl font-bold text-slate-900 leading-none">Organize Document ({images.length} pages)</h3>
+              <Button
+                variant="danger"
+                onClick={onReset}
+                className={`${commonActionStyles} w-full sm:w-auto`}
+              >
+                <Trash2 size={20} className="mr-2" /> Reset
               </Button>
             </div>
-            <Button onClick={onContinue}>
-              Continue <ArrowRight size={16} className="ml-2" />
+
+            <Button
+              onClick={onContinue}
+              className={`${commonActionStyles} hover:bg-blue-700 w-full md:w-auto`}
+            >
+              Continue <ArrowRight size={20} className="ml-2" />
             </Button>
           </div>
 

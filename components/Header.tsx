@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSignInClick
 }) => {
   return (
-    <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+    <header className="bg-white border-b border-slate-200 px-6 py-2 flex items-center justify-between sticky top-0 z-50">
       <div className="flex items-center gap-3">
         <div className="bg-indigo-600 p-2 rounded-lg">
           <FileText className="text-white" size={24} />
@@ -53,7 +53,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
         )}
-        <AccountMenu onSignInClick={onSignInClick} />
+        <AccountMenu
+          onSignInClick={onSignInClick}
+          showSignInButton={!showProgress || currentPage === undefined}
+        />
       </div>
     </header>
   );
