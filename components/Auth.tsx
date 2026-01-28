@@ -1,5 +1,18 @@
 import React, { useState } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChevronLeft } from "lucide-react";
 
 export function Auth({ onBack, message }: { onBack?: () => void; message?: string | null }) {
     const { signIn } = useAuthActions();
@@ -19,116 +32,97 @@ export function Auth({ onBack, message }: { onBack?: () => void; message?: strin
     };
 
     return (
-        <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
-            <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-slate-100 relative">
-                <div className="relative">
-                    {onBack && (
-                        <button
-                            onClick={onBack}
-                            className="mb-4 text-slate-400 hover:text-slate-600 transition-colors text-sm font-medium flex items-center gap-1"
-                        >
-                            ← Back
-                        </button>
-                    )}
+        <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <Card className="w-full max-w-md border-border/50 shadow-xl overflow-hidden rounded-2xl bg-card relative">
+                {onBack && (
+                    <Button
+                        variant="ghost"
+                        onClick={onBack}
+                        className="absolute left-4 top-6 h-8 px-2 text-muted-foreground hover:text-foreground z-10"
+                    >
+                        <ChevronLeft size={16} className="mr-1" />
+                        Back
+                    </Button>
+                )}
 
+                <CardHeader className="space-y-1 pt-16 pb-4">
+                    <CardTitle className="text-2xl font-extrabold tracking-tight text-center">
+                        {step === "signIn" ? "Welcome Back" : "Create Account"}
+                    </CardTitle>
+                    <CardDescription className="text-center text-sm text-muted-foreground">
+                        {step === "signIn"
+                            ? "Enter your credentials to access your documents"
+                            : "Start your professional document OCR journey"}
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent className="space-y-4 px-8 pb-0">
                     {message && (
-                        <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800 font-medium text-center mb-6">
+                        <div className="bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm text-amber-800 font-medium text-center mb-4">
                             {message}
                         </div>
                     )}
 
-                    <div className="text-center">
-                        <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
-                            {step === "signIn" ? "Welcome Back" : "Create your account"}
-                        </h2>
-                        <p className="mt-2 text-sm text-slate-600">
-                            {step === "signIn" ? (
-                                <>
-                                    Don&apos;t have an account?{" "}
-                                    <button
-                                        onClick={() => setStep("signUp")}
-                                        className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
-                                    >
-                                        Sign up
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    Already have an account?{" "}
-                                    <button
-                                        onClick={() => setStep("signIn")}
-                                        className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
-                                    >
-                                        Sign in
-                                    </button>
-                                </>
+                    <Tabs value={step} onValueChange={(v) => setStep(v as any)} className="w-full">
+                        <TabsList className="grid w-full grid-cols-2 mb-6 bg-muted p-1 rounded-lg">
+                            <TabsTrigger value="signIn" className="rounded-md">Sign In</TabsTrigger>
+                            <TabsTrigger value="signUp" className="rounded-md">Sign Up</TabsTrigger>
+                        </TabsList>
+
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <input name="flow" type="hidden" value={step} />
+                            <div className="space-y-2">
+                                <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">Email Address</Label>
+                                <Input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    required
+                                    className="rounded-xl h-11 bg-muted/30 border-muted focus:bg-background transition-all"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">Password</Label>
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    placeholder="••••••••"
+                                    required
+                                    className="rounded-xl h-11 bg-muted/30 border-muted focus:bg-background transition-all"
+                                />
+                            </div>
+
+                            {error && (
+                                <div className="text-destructive text-sm text-center font-medium bg-destructive/5 py-2 rounded-lg border border-destructive/10 animate-in fade-in slide-in-from-top-1">
+                                    {error}
+                                </div>
                             )}
-                        </p>
+
+                            <Button type="submit" className="w-full h-11 text-base font-semibold rounded-xl transition-transform active:scale-[0.98]">
+                                {step === "signIn" ? "Sign In" : "Create Account"}
+                            </Button>
+                        </form>
+                    </Tabs>
+                </CardContent>
+
+                <div className="relative py-2 px-8">
+                    <div className="absolute inset-0 flex items-center px-8">
+                        <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-[10px] uppercase tracking-widest">
+                        <span className="bg-card px-3 text-muted-foreground/60 font-bold">
+                            Or continue with
+                        </span>
                     </div>
                 </div>
 
-                <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
-                    <input name="flow" type="hidden" value={step} />
-                    <div className="space-y-4">
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                                Email address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                required
-                                className="block w-full border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 sm:text-sm transition-all bg-slate-50 focus:bg-white outline-none"
-                                placeholder="you@example.com"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                autoComplete="current-password"
-                                required
-                                className="block w-full border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 shadow-sm focus:border-indigo-500 focus:ring-4 focus:ring-indigo-50 sm:text-sm transition-all bg-slate-50 focus:bg-white outline-none"
-                                placeholder="••••••••"
-                            />
-                        </div>
-                    </div>
-
-                    {error && (
-                        <div className="text-red-500 text-sm text-center font-medium bg-red-50 py-2 rounded-lg">
-                            {error}
-                        </div>
-                    )}
-
-                    <div className="pt-2">
-                        <button
-                            type="submit"
-                            className="group relative flex w-full justify-center rounded-xl bg-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all shadow-md active:scale-[0.98]"
-                        >
-                            {step === "signIn" ? "Sign in" : "Sign up"}
-                        </button>
-                    </div>
-                </form>
-
-                <div className="relative mt-8">
-                    <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                        <div className="w-full border-t border-slate-100"></div>
-                    </div>
-                    <div className="relative flex justify-center text-xs font-medium uppercase tracking-widest text-slate-400">
-                        <span className="bg-white px-4">Or continue with</span>
-                    </div>
-                </div>
-
-                <div className="mt-6">
-                    <button
+                <CardFooter className="px-8 pb-10">
+                    <Button
+                        variant="outline"
                         onClick={() => signIn("google")}
-                        className="flex w-full items-center justify-center gap-3 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-200 hover:bg-slate-50 hover:ring-slate-300 transition-all active:scale-[0.98]"
+                        className="w-full h-11 rounded-xl font-semibold gap-3 hover:bg-muted/50 transition-all active:scale-[0.98]"
                     >
                         <svg className="h-5 w-5" viewBox="0 0 24 24">
                             <path
@@ -149,9 +143,9 @@ export function Auth({ onBack, message }: { onBack?: () => void; message?: strin
                             />
                         </svg>
                         Google
-                    </button>
-                </div>
-            </div>
+                    </Button>
+                </CardFooter>
+            </Card>
         </div>
     );
 }

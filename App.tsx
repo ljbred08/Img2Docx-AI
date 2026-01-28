@@ -311,11 +311,11 @@ export default function App() {
           setShowAuth(true);
         }}
       />
-      <main className="flex-1 bg-slate-50 py-8 px-6 overflow-hidden">
+      <main className="flex-1 bg-background py-8 px-6 overflow-hidden">
         <div className="max-w-7xl mx-auto h-full">
           {isLoading ? (
             <div className="flex h-full items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
             </div>
           ) : renderCurrentStep()}
         </div>

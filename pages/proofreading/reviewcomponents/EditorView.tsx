@@ -42,10 +42,10 @@ export const EditorView: React.FC<EditorViewProps> = ({
   onDiscardChange
 }) => {
   return (
-    <div className="flex-1 flex flex-col min-h-0 relative bg-white border border-slate-300 rounded-xl shadow-sm overflow-hidden">
+    <div className="flex-1 flex flex-col min-h-0 relative bg-card border border-border rounded-xl shadow-sm overflow-hidden">
        {/* Editor Panel Header */}
-       <div className="flex items-center justify-between px-4 py-2 bg-slate-50 border-b border-slate-200">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+       <div className="flex items-center justify-between px-4 py-2 bg-muted border-b border-border">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
             <FileText size={14} /> {isDiffMode ? 'Interactive Diff' : 'Editor'}
           </label>
           
@@ -70,7 +70,7 @@ export const EditorView: React.FC<EditorViewProps> = ({
                  return (
                    <div key={i} className={`relative group/line ${bgColor} ${textColor} flex`}>
                      {/* Gutter / Sign Column */}
-                     <div className="w-10 flex-shrink-0 text-right pr-3 select-none text-slate-300 border-r border-slate-100 bg-slate-50/50 py-0.5">
+                     <div className="w-10 flex-shrink-0 text-right pr-3 select-none text-muted-foreground/50 border-r border-border bg-muted/30 py-0.5">
                        {prefix}
                      </div>
                      {/* Line Content */}

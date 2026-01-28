@@ -48,11 +48,11 @@ export const ReviewHeader: React.FC<ReviewHeaderProps> = ({
     <div className="flex gap-4 mb-4 items-end">
       {/* Left side: shrink-0 ensures it only takes necessary width, allowing right side to expand left */}
       <div className="shrink-0 pb-1">
-        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
           Page Review ({pageIndex + 1}/{totalPages})
-          {status === 'analyzing' && <Loader2 className="animate-spin text-blue-500" size={18}/>}
+          {status === 'analyzing' && <Loader2 className="animate-spin text-primary" size={18}/>}
         </h2>
-        <p className="text-sm text-slate-500 leading-tight">
+        <p className="text-sm text-muted-foreground leading-tight">
           {!aiProvider 
             ? "Review the OCR text manually." 
             : "Review suggestions or edit manually."}
@@ -65,10 +65,10 @@ export const ReviewHeader: React.FC<ReviewHeaderProps> = ({
         {aiProvider && (
           <form 
             onSubmit={onRerun}
-            className={`flex-1 h-full flex items-center bg-white pl-1.5 pr-1.5 rounded-full border border-slate-200 shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-100 focus-within:border-blue-300 ${isAnalyzing ? 'opacity-60 pointer-events-none' : 'opacity-100'}`}
+            className={`flex-1 h-full flex items-center bg-card pl-1.5 pr-1.5 rounded-full border border-border shadow-sm transition-all duration-200 focus-within:ring-2 focus-within:ring-ring/50 focus-within:border-primary ${isAnalyzing ? 'opacity-60 pointer-events-none' : 'opacity-100'}`}
             style={{ marginTop: 0, marginBottom: 0 }}
           >
-            <div className="pl-2 pr-2 flex items-center text-blue-600 shrink-0">
+            <div className="pl-2 pr-2 flex items-center text-primary shrink-0">
               {isAnalyzing ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
             </div>
             <input 
@@ -76,12 +76,12 @@ export const ReviewHeader: React.FC<ReviewHeaderProps> = ({
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               placeholder="Instructions for AI corrections..."
-              className="flex-1 bg-transparent border-none outline-none text-xs text-slate-700 font-medium placeholder:text-slate-400 h-full"
+              className="flex-1 bg-transparent border-none outline-none text-xs text-foreground font-medium placeholder:text-muted-foreground h-full"
             />
             <button 
               type="submit"
               disabled={isAnalyzing}
-              className="px-4 h-7 bg-slate-100 text-slate-600 rounded-full text-xs font-bold hover:bg-slate-200 disabled:bg-slate-50 disabled:text-slate-300 transition-colors shrink-0 ml-1"
+              className="px-4 h-7 bg-muted text-foreground rounded-full text-xs font-bold hover:bg-muted/80 disabled:bg-muted/50 disabled:text-muted-foreground transition-colors shrink-0 ml-1"
             >
               Rerun
             </button>
@@ -93,8 +93,8 @@ export const ReviewHeader: React.FC<ReviewHeaderProps> = ({
           onClick={() => setAutoAdvance(!autoAdvance)}
           className={`h-full px-4 rounded-full text-xs font-bold border flex items-center gap-2 transition-all shadow-sm shrink-0 whitespace-nowrap ${
             autoAdvance 
-              ? 'bg-blue-600 border-blue-600 text-white ring-2 ring-blue-100' 
-              : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+              ? 'bg-primary border-primary text-primary-foreground ring-2 ring-primary/20' 
+              : 'bg-card border-border text-muted-foreground hover:border-border/80'
           }`}
         >
           <Zap size={14} className={autoAdvance ? 'fill-current' : ''} />

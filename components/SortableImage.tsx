@@ -42,10 +42,10 @@ export const SortableImage: React.FC<SortableImageProps> = ({ image, onRemove })
       style={style}
       {...attributes} 
       {...listeners} 
-      className={`relative group bg-white p-2 rounded-xl border shadow-sm transition-all cursor-grab active:cursor-grabbing touch-none ${isDragging ? 'border-blue-500 shadow-xl scale-105 opacity-90' : 'border-slate-200 hover:shadow-md'}`}
+      className={`relative group bg-background p-2 rounded-xl border shadow-sm transition-all cursor-grab active:cursor-grabbing touch-none ${isDragging ? 'border-primary shadow-xl scale-105 opacity-90' : 'border-border hover:shadow-md'}`}
     >
       {/* Visual drag handle */}
-      <div className="absolute top-2 left-2 z-10 p-1.5 bg-black/50 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+      <div className="absolute top-2 left-2 z-10 p-1.5 bg-primary/10 text-foreground rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
         <GripVertical size={16} />
       </div>
 
@@ -56,18 +56,18 @@ export const SortableImage: React.FC<SortableImageProps> = ({ image, onRemove })
           onRemove(image.id);
         }}
         onPointerDown={(e) => e.stopPropagation()}
-        className="absolute top-2 right-2 z-10 p-1.5 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600 cursor-pointer"
+        className="absolute top-2 right-2 z-10 p-1.5 bg-destructive text-destructive-foreground rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-destructive/90 cursor-pointer"
       >
         <X size={16} />
       </button>
 
       {/* Image thumbnail display */}
-      <div className="aspect-[3/4] overflow-hidden rounded-lg bg-slate-100 pointer-events-none">
+      <div className="aspect-[3/4] overflow-hidden rounded-lg bg-muted pointer-events-none">
         <img src={image.thumbnailUrl} alt="preview" className="w-full h-full object-cover" />
       </div>
 
       {/* File name footer */}
-      <div className="mt-2 text-xs text-slate-500 truncate px-1 pointer-events-none">{image.file.name}</div>
+      <div className="mt-2 text-xs text-muted-foreground truncate px-1 pointer-events-none">{image.file.name}</div>
     </div>
   );
 };

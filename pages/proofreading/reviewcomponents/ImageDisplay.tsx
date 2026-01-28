@@ -14,7 +14,7 @@ interface ImageDisplayProps {
 
 export const ImageDisplay: React.FC<ImageDisplayProps> = ({ previewUrl }) => {
   return (
-    <div className="flex-1 bg-slate-900 rounded-xl overflow-hidden flex items-center justify-center p-4 shadow-inner">
+    <div className="flex-1 bg-slate-950 rounded-xl overflow-hidden flex items-center justify-center p-4 shadow-inner">
        {/* Maximize image while maintaining aspect ratio */}
        <img src={previewUrl} alt="Original" className="max-w-full max-h-full object-contain" />
     </div>

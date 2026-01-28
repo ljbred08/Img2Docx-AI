@@ -12,7 +12,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Cpu, Key, Check, ChevronDown, Zap } from 'lucide-react';
 import { AiConfig } from '../../types';
-import { Button } from '../../components/Button';
+import { Button } from '@/components/ui/button';
 import { MODEL_FAMILIES } from '../../modelConfig';
 import { DEV_KEYS } from '../../devConfig';
 
@@ -132,19 +132,19 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-2xl mx-auto bg-card p-8 rounded-2xl shadow-sm border border-border animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="text-center mb-8">
-        <div className="inline-flex p-3 bg-indigo-100 text-indigo-600 rounded-xl mb-4"><Cpu size={28} /></div>
-        <h2 className="text-2xl font-bold text-slate-900">Configure AI Proofreader</h2>
-        <p className="text-slate-500 mt-2">Select the intelligence model that best fits your needs.</p>
+        <div className="inline-flex p-3 bg-primary/10 text-primary rounded-xl mb-4"><Cpu size={28} /></div>
+        <h2 className="text-2xl font-bold text-foreground">Configure AI Proofreader</h2>
+        <p className="text-muted-foreground mt-2">Select the intelligence model that best fits your needs.</p>
       </div>
 
       {/* Conditional OpenRouter Key Entry & Nitro Mode */}
       {isKeyRequired && (
         <div className="mb-6 animate-in slide-in-from-top-2 fade-in duration-300 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2 flex items-center gap-2">
-              <Key size={14} className="text-indigo-500"/> OpenRouter API Key
+            <label className="block text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+              <Key size={14} className="text-primary"/> OpenRouter API Key
             </label>
             <div className="relative">
               <input 
@@ -153,7 +153,7 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
                 onChange={(e) => setOpenRouterKey(e.target.value)}
                 placeholder="sk-or-..." 
                 autoFocus
-                className="w-full pl-4 pr-4 py-3 border border-indigo-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-indigo-50/30 text-slate-800"
+                className="w-full pl-4 pr-4 py-3 border border-primary/30 rounded-xl focus:ring-2 focus:ring-ring outline-none bg-primary/5 text-foreground"
               />
             </div>
             <div className="flex items-center gap-2 mt-2">
@@ -164,13 +164,13 @@ export const ModelConfigPage: React.FC<ModelConfigPageProps> = ({ onBack, onConf
                 onChange={(e) => setRememberOpenRouter(e.target.checked)}
                 className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               />
-              <label htmlFor="remember_openrouter" className="text-xs text-slate-500 cursor-pointer select-none">
+              <label htmlFor="remember_openrouter" className="text-xs text-muted-foreground cursor-pointer select-none">
                 Remember this key for next time
               </label>
             </div>
           </div>
 
-          <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex items-start gap-4 transition-all">
+          <div className="p-4 bg-primary/5 border border-primary/20 rounded-2xl flex items-start gap-4 transition-all">
             <input 
               type="checkbox" 
               id="nitro_mode"

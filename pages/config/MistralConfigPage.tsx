@@ -6,8 +6,10 @@
  */
 
 import React from 'react';
-import { FileText, AlertTriangle } from 'lucide-react';
-import { Button } from '../../components/Button';
+import { FileText, AlertTriangle, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface MistralConfigPageProps {
   /** The currently entered API key */
@@ -36,34 +38,37 @@ export const MistralConfigPage: React.FC<MistralConfigPageProps> = ({
   isProcessing
 }) => {
   return (
-    <div className="max-w-xl mx-auto space-y-6 bg-white p-8 rounded-2xl shadow-sm border border-slate-200 animate-in slide-in-from-bottom-4 duration-500">
+    <div className="max-w-xl mx-auto space-y-6 bg-card p-8 rounded-2xl shadow-sm border border-border animate-in slide-in-from-bottom-4 duration-500">
       <div className="text-center">
-        <div className="inline-flex p-3 bg-purple-100 text-purple-600 rounded-xl mb-4"><FileText size={28} /></div>
-        <h2 className="text-2xl font-bold text-slate-900">OCR Configuration</h2>
-        <p className="text-slate-500 mt-2 text-sm">Mistral's OCR model is required to convert image content to Markdown.</p>
+        <div className="inline-flex p-3 bg-primary/10 text-primary rounded-xl mb-4"><FileText size={28} /></div>
+        <h2 className="text-2xl font-bold text-foreground">OCR Configuration</h2>
+        <p className="text-muted-foreground mt-2 text-sm">Mistral's OCR model is required to convert image content to Markdown.</p>
       </div>
 
       {/* API Key Input Section */}
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-700">Mistral API Key</label>
-        <input 
-          type="password" 
-          value={mistralKey} 
-          onChange={(e) => setMistralKey(e.target.value)} 
-          placeholder="sk-..." 
-          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none" 
-        />
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="mistral-key">Mistral API Key</Label>
+          <Input
+            id="mistral-key"
+            type="password"
+            value={mistralKey}
+            onChange={(e) => setMistralKey(e.target.value)}
+            placeholder="sk-..."
+            className="rounded-xl h-11"
+          />
+        </div>
         <div className="flex items-center gap-2 mt-2">
-          <input 
-            type="checkbox" 
+          <input
+            type="checkbox"
             id="remember_mistral"
             checked={rememberMistral}
             onChange={(e) => setRememberMistral(e.target.checked)}
-            className="rounded border-slate-300 text-purple-600 focus:ring-indigo-500"
+            className="rounded border-input text-primary focus:ring-ring"
           />
-          <label htmlFor="remember_mistral" className="text-xs text-slate-500 cursor-pointer select-none">
+          <Label htmlFor="remember_mistral" className="text-xs text-muted-foreground cursor-pointer select-none">
             Remember this key for next time
-          </label>
+          </Label>
         </div>
       </div>
 
@@ -77,7 +82,10 @@ export const MistralConfigPage: React.FC<MistralConfigPageProps> = ({
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4">
         <Button variant="ghost" onClick={onBack} className="flex-1">Back</Button>
-        <Button onClick={onStart} isLoading={isProcessing} className="flex-1">Start OCR</Button>
+        <Button onClick={onStart} disabled={isProcessing} className="flex-1">
+          {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Start OCR
+        </Button>
       </div>
     </div>
   );

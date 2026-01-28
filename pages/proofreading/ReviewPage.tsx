@@ -14,7 +14,7 @@ import { ArrowRight } from 'lucide-react';
 import { diffLines } from 'diff';
 import { OcrPageResult, AiConfig } from '../../types';
 import { proofreadPage } from '../../services/proofreading';
-import { Button } from '../../components/Button';
+import { Button } from '@/components/ui/button';
 
 // Refactored UI Subcomponents
 import { ReviewHeader } from './reviewcomponents/ReviewHeader';
@@ -282,7 +282,7 @@ export const ReviewPage: React.FC<ReviewPageProps> = ({
       {/* Main Review Layout (Side-by-Side) */}
       <div className="flex-1 flex gap-6 min-h-0">
         {/* Left: Original Document Image */}
-        <div className="flex-1 relative bg-slate-900 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
+        <div className="flex-1 relative bg-slate-950 rounded-xl overflow-hidden shadow-inner flex items-center justify-center">
           <ImageDisplay previewUrl={page.originalImage.previewUrl} />
         </div>
 

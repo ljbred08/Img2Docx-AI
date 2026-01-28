@@ -10,7 +10,7 @@
 
 import React from 'react';
 import { FileUp, Settings2, Check, Download, FileText } from 'lucide-react';
-import { Button } from '../../components/Button';
+import { Button } from '@/components/ui/button';
 
 interface DownloadPageProps {
   /** Document layout settings state and setter */
@@ -37,31 +37,31 @@ export const DownloadPage: React.FC<DownloadPageProps> = ({
         <FileUp size={40} />
       </div>
       <div>
-        <h2 className="text-3xl font-bold text-slate-900">Ready to Download</h2>
-        <p className="text-slate-500 mt-2 text-lg">Your processed document is formatted and ready.</p>
+        <h2 className="text-3xl font-bold text-foreground">Ready to Download</h2>
+        <p className="text-muted-foreground mt-2 text-lg">Your processed document is formatted and ready.</p>
       </div>
 
       {/* Formatting Options Panel */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 text-left shadow-sm max-w-sm mx-auto">
-        <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+      <div className="bg-card border border-border rounded-2xl p-6 text-left shadow-sm max-w-sm mx-auto">
+        <h4 className="text-sm font-bold text-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
           <Settings2 size={16} /> Document Layout
         </h4>
-        <div 
-          className="flex items-center gap-3 group cursor-pointer" 
+        <div
+          className="flex items-center gap-3 group cursor-pointer"
           onClick={() => setIncludePageBreaks(!includePageBreaks)}
         >
           {/* Custom Checkbox */}
-          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${includePageBreaks ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-300'}`}>
+          <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${includePageBreaks ? 'bg-primary border-primary text-primary-foreground' : 'bg-background border-input'}`}>
             {includePageBreaks && <Check size={14} />}
           </div>
-          <span className="text-sm text-slate-700 font-medium select-none">Include Page Breaks</span>
+          <span className="text-sm text-foreground font-medium select-none">Include Page Breaks</span>
         </div>
-        <p className="text-xs text-slate-500 mt-2 ml-8">When checked, each original image starts on a new page in the Word document.</p>
+        <p className="text-xs text-muted-foreground mt-2 ml-8">When checked, each original image starts on a new page in the Word document.</p>
       </div>
 
       {/* Download Action Cards */}
       <div className="grid grid-cols-2 gap-4 max-w-sm mx-auto">
-        <Button onClick={() => onDownload('docx')} className="h-24 flex-col gap-2 bg-blue-600 hover:bg-blue-700">
+        <Button onClick={() => onDownload('docx')} className="h-24 flex-col gap-2 bg-primary hover:bg-primary/90">
           <Download size={24} />
           <span>Microsoft Word</span>
         </Button>
@@ -72,7 +72,7 @@ export const DownloadPage: React.FC<DownloadPageProps> = ({
       </div>
 
       {/* Footer Secondary Navigation */}
-      <div className="pt-8 border-t border-slate-200 flex flex-col gap-3">
+      <div className="pt-8 border-t border-border flex flex-col gap-3">
         <Button variant="outline" onClick={onBackToReview} className="w-full">Back to Review</Button>
         <Button variant="ghost" onClick={onReset} className="w-full">Start New Project</Button>
       </div>

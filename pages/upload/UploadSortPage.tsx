@@ -27,8 +27,8 @@ import {
 } from '@dnd-kit/sortable';
 import { Upload, Loader2, Trash2, ArrowRight } from 'lucide-react';
 import { UploadedImage } from '../../types';
-import { SortableImage } from './SortableImage';
-import { Button } from '../../components/Button';
+import { SortableImage } from '../../components/SortableImage';
+import { Button } from '@/components/ui/button';
 import { processPdfToImages, generateId, generateThumbnail } from '../../utils/fileUtils';
 
 interface UploadSortPageProps {
@@ -134,17 +134,17 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Upload Trigger Area */}
       <div
-        className={`border-2 border-dashed rounded-2xl p-12 text-center hover:bg-slate-50 transition-colors cursor-pointer ${isFilesLoading ? 'border-blue-400 bg-blue-50/20 pointer-events-none' : 'border-slate-300'}`}
+        className={`border-2 border-dashed rounded-2xl p-12 text-center hover:bg-muted/50 transition-colors cursor-pointer ${isFilesLoading ? 'border-primary bg-primary/10 pointer-events-none' : 'border-border'}`}
         onClick={() => fileInputRef.current?.click()}
       >
         <input type="file" multiple accept="image/*,.pdf" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
         <div className="flex flex-col items-center gap-4">
-          <div className={`p-4 rounded-full ${isFilesLoading ? 'bg-blue-100 text-blue-400' : 'bg-blue-50 text-blue-600'}`}>
+          <div className={`p-4 rounded-full ${isFilesLoading ? 'bg-muted text-primary/40' : 'bg-primary/10 text-primary'}`}>
             {isFilesLoading ? <Loader2 size={32} className="animate-spin" /> : <Upload size={32} />}
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-slate-900">{isFilesLoading ? 'Processing Files...' : 'Upload Images or PDF'}</h3>
-            <p className="text-slate-500 mt-1">{isFilesLoading ? 'Extracting pages from PDF...' : 'Select files to get started'}</p>
+            <h3 className="text-xl font-semibold text-foreground">{isFilesLoading ? 'Processing Files...' : 'Upload Images or PDF'}</h3>
+            <p className="text-muted-foreground mt-1">{isFilesLoading ? 'Extracting pages from PDF...' : 'Select files to get started'}</p>
           </div>
         </div>
       </div>
@@ -154,9 +154,9 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
         <div className="space-y-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <h3 className="text-xl font-bold text-slate-900 leading-none">Organize Document ({images.length} pages)</h3>
+              <h3 className="text-xl font-bold text-foreground leading-none">Organize Document ({images.length} pages)</h3>
               <Button
-                variant="danger"
+                variant="destructive"
                 onClick={onReset}
                 className={`${commonActionStyles} w-full sm:w-auto`}
               >
@@ -166,7 +166,7 @@ export const UploadSortPage: React.FC<UploadSortPageProps> = ({
 
             <Button
               onClick={onContinue}
-              className={`${commonActionStyles} hover:bg-blue-700 w-full md:w-auto`}
+              className={`${commonActionStyles} w-full md:w-auto`}
             >
               Continue <ArrowRight size={20} className="ml-2" />
             </Button>

@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Sparkles, AlertTriangle, CheckCircle } from 'lucide-react';
-import { Button } from '../../../components/Button';
+import { Button } from '@/components/ui/button';
 
 interface AiSuggestionsBoxProps {
   /** Current status of the AI analyst */
@@ -46,7 +46,7 @@ export const AiSuggestionsBox: React.FC<AiSuggestionsBoxProps> = ({
       {/* Dynamic Icon choice */}
       {status === 'analyzing' ? <Sparkles className="text-blue-500 mt-0.5 shrink-0" size={18} /> :
        hasError ? <AlertTriangle className="text-amber-600 mt-0.5 shrink-0" size={18} /> : <CheckCircle className="text-green-600 mt-0.5 shrink-0" size={18} />}
-      
+
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-4 mb-1.5">
           <h4 className={`text-sm font-semibold ${
