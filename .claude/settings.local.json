@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__zai-mcp-server__ui_to_artifact",
+      "mcp__web-search-prime__webSearchPrime",
+      "mcp__morph__warpgrep_codebase_search",
+      "mcp__morph__edit_file",
+      "Bash(git add:*)"
+    ]
+  }
+}
